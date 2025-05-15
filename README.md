@@ -17,7 +17,7 @@ The dataset includes:
 - **Lesion Image & Metadata Set**: lesion slices (with/without BBox), metadata (size, description)
 - **QA Benchmark Component**: VQA tasks in both LLM and CLIP styles, with hard negatives
 
-📝 **Download instructions and access links are included in the NeurIPS submission.**
+📝 **Download links are included in the NeurIPS submission.**
 
 ### Folder Structure After Extraction
 
