@@ -25,7 +25,7 @@ The dataset includes:
 data/
 ├── clip/              # QA pairs for CLIP-style models
 ├── llm/               # QA pairs for LLM-style models
-├── lesion_bbox/       # PNG images with bounding boxes (cropped)
+├── lesion_bbox/       # PNG images with bounding boxes 
 ├── lesion_nobox/      # PNG images without bounding boxes
 ├── Metadata.csv       # Lesion info: id, description, size, split
 ├── qa_clip.json       # Structured QA for CLIP models
@@ -107,7 +107,7 @@ python run_llm_qa_all_models_notice.py \
 ```
 
 Tasks: `img2txt`, `ct2txt`, `img2attrib`, `ct2attrib`, `img2size`, etc.
-
+Each question is saved in output_data.json with model answers. GPT-4V and Gemini include explanations. Other models return answers only.
 ---
 
 ## 🎯 4. QA Benchmark: CLIP-Style (BiomedCLIP, PMC-CLIP)
