@@ -1,0 +1,7 @@
+# Core dependencies for CT-Bench data handling and evaluation
+pandas
+nltk
+bert-score
+sentence-transformers
+tqdm
+Pillow
