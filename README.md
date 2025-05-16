@@ -38,14 +38,16 @@ data/
 
 ```
 ct-bench/
-├── captioning/                    # Image captioning with GPT-4V or others
-│   └── image_caption.py
+├── captioning/                    # Image captioning with GPT-4V or Gemini
+│   └── caption_generator.py
 ├── training/                      # Fine-tuning BiomedCLIP, RadFM, etc.
 │   └── biomedclip.py
 ├── qa_llm/                        # QA evaluation using LLM-style models
 │   └── run_qa_vlm.py
 ├── qa_clip/                       # QA evaluation using CLIP-style models
 │   └── run_qa_clip.py
+├── evaluation/                    # Metric evaluation for caption outputs
+│   └── evaluate_caption_json.py
 ├── models/                        # Modular model wrappers
 │   ├── __init__.py
 │   ├── base.py
@@ -60,20 +62,23 @@ ct-bench/
 
 ---
 
-## 🖼️ 1. Lesion Image Captioning with GPT-4V
+## 🖼️ 1. Lesion Image Captioning
 
-Generate CT lesion descriptions using GPT-4V.
+Generate CT lesion descriptions using GPT-4V or Gemini:
 
 ```bash
-python captioning/image_caption.py \
-  --image_dir data/lesion_nobox \
+python captioning/caption_generator.py \
+  --model gpt4v \
+  --image_dir data/lesion_bbox \
   --metadata data/Metadata.csv \
   --output_dir results/captions
 ```
 
+Change `--model gemini` to use Gemini instead.
+
 - Input: `.png` images, `Metadata.csv`
-- Output: `gpt4v_captions.json` with model-generated and ground-truth captions
-- Requires `OPENAI_API_KEY` to be set in your environment
+- Output: `gpt4v_captions.json` or `gemini_captions.json`
+- Requires `OPENAI_API_KEY` or `GOOGLE_API_KEY` to be set
 
 ---
 
@@ -88,15 +93,14 @@ python training/biomedclip.py \
   --output_dir results/biomedclip
 ```
 
-Supports both with and without BBox supervision:
-- Use `--with_bbox` flag to include cropped regions
-- Logs and model checkpoints saved to `results/biomedclip/`
+- Use `--with_bbox` to enable spatial supervision
+- Outputs logs, checkpoints, and evaluation metrics
 
 ---
 
 ## 🤖 3. QA Benchmark: LLM-Style (GPT-4V, Gemini, etc.)
 
-Evaluate large language-vision models on clinical lesion QA tasks.
+Evaluate large vision-language models on lesion-level multiple choice tasks.
 
 ```bash
 python qa_llm/run_qa_vlm.py \
@@ -105,14 +109,13 @@ python qa_llm/run_qa_vlm.py \
   --input_dir data/llm/test
 ```
 
-Supported tasks:
-- `img2txt`, `ct2txt`, `img2attrib`, `ct2attrib`, `img2size`, etc.
+Tasks: `img2txt`, `ct2txt`, `img2attrib`, `ct2attrib`, `img2size`, etc.
 
 ---
 
 ## 🎯 4. QA Benchmark: CLIP-Style (BiomedCLIP, PMC-CLIP)
 
-Use image-text retrieval to answer QA tasks with hard negatives.
+Use image-text similarity for retrieval-based multiple choice.
 
 ```bash
 python qa_clip/run_qa_clip.py \
@@ -121,14 +124,44 @@ python qa_clip/run_qa_clip.py \
   --input_dir data/clip/test
 ```
 
-Tasks include:
-- `txt2img`, `txt2bbox`, `img2attrib`
+Tasks: `txt2img`, `txt2bbox`, `img2attrib`
+
+---
+
+## 📊 5. Evaluation of Captions
+
+Evaluate Gemini or GPT-4V caption output using automatic metrics:
+
+```bash
+python evaluation/evaluate_caption_json.py \
+  --json_file results/captions/gpt4v_captions.json
+```
+
+Metrics:
+- BLEU-1, METEOR, ROUGE-1
+- BERTScore, Cosine Similarity (SBERT)
+
+---
+
+## 🧪 Tested Models
+
+CT-Bench was used to evaluate a diverse set of models across both captioning and QA tasks. Model settings and implementation details are available at the links below:
+
+| Model              | Type                   | Source / Settings |
+|--------------------|------------------------|--------------------|
+| **BiomedCLIP**       | CLIP-style (medical)     | [HuggingFace](https://huggingface.co/microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224) |
+| **RadFM**            | LLM-style (medical VLM)  | [GitHub](https://github.com/chaoyi-wu/RadFM/tree/main/src) |
+| **Dragonfly**        | General LLM + vision     | [Together AI](https://www.together.ai/blog/dragonfly-v1) |
+| **PMC-CLIP**         | CLIP-style (medical)     | [GitHub](https://github.com/WeixiongLin/PMC-CLIP/tree/b0b81e3629740b4af837338ab5afa46e5d03a18e) |
+| **LLaVA-Med**        | Open-source medical VLM  | [GitHub](https://github.com/microsoft/LLaVA-Med) |
+| **GPT-4V**           | Commercial LLM-Vision API| [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/ai-services/openai-service) |
+| **Gemini 1.5 Pro**   | Commercial LLM-Vision API| [Google Gemini](https://ai.google.dev/gemini-api) |
+
+Model-specific configurations, input styles (prompting or retrieval), and evaluation setups follow the guidelines in their respective repositories.
 
 ---
 
 ## ⚙️ Requirements
-
-Install dependencies with:
 
 ```bash
 pip install -r requirements.txt
@@ -137,19 +170,19 @@ pip install -r requirements.txt
 Includes:
 - Python 3.8+
 - PyTorch 2.0+
-- OpenAI SDK
-- Pillow, TQDM, etc.
+- SentenceTransformers, BERTScore
+- OpenAI + Gemini SDKs
 
 ---
 
 ## 🔒 Reproducibility & Anonymity
 
 - This repository is anonymized for NeurIPS review.
-- Dataset access and additional models (e.g., Gemini, Dragonfly) are described in the paper.
-- Only GPT-4V and BiomedCLIP are exposed for simplicity and reproducibility.
+- GPT-4V and BiomedCLIP are primary baselines.
+- Other model results (Gemini, Dragonfly, etc.) are reproducible using included tools.
 
 ---
 
 ## 📬 Contact
 
-Please refer to the NeurIPS submission for correspondence and dataset request info.
+Please refer to the NeurIPS submission for correspondence and dataset access instructions.
