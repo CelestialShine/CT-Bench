@@ -38,22 +38,23 @@ data/
 
 ```
 ct-bench/
-├── captioning/                    # Image captioning with GPT-4V or Gemini
-│   └── caption_generator.py
-├── training/                      # Fine-tuning BiomedCLIP, RadFM, etc.
-│   └── biomedclip.py
-├── qa_llm/                        # QA evaluation using LLM-style models
-│   └── run_qa_vlm.py
-├── qa_clip/                       # QA evaluation using CLIP-style models
-│   └── run_qa_clip.py
-├── evaluation/                    # Metric evaluation for caption outputs
-│   └── evaluate_caption_json.py
-├── models/                        # Modular model wrappers
+├── captioning/                    
+│   └── caption_generator.py       # Image captioning with GPT-4V or Gemini
+├── training/                      
+│   └── biomedclip.py              # Fine-tuning BiomedCLIP
+├── qa_llm/                        
+│   └── run_llm_qa_all_models_notice.py  # QA for GPT-4V, Gemini, LLaVA-Med, etc.
+├── qa_clip/                       
+│   ├── run_all_tasks.py           # CLIP-style QA main script
+│   ├── task_dataset_evaluator.py  # Evaluation logic
+│   └── task_dataset_wrapper.py    # Dataset loader
+├── evaluation/                    
+│   └── evaluate_caption_json.py   # Caption metrics evaluation
+├── models/                        
 │   ├── __init__.py
 │   ├── base.py
 │   ├── gpt4v.py
 │   ├── biomedclip.py
-├── data/                          # External dataset (see above)
 ├── results/                       # Output logs, captions, predictions
 ├── configs/                       # Optional config files
 ├── requirements.txt
@@ -84,50 +85,60 @@ Change `--model gemini` to use Gemini instead.
 
 ## 🧪 2. Fine-Tuning BiomedCLIP on CT-Bench
 
-Train contrastive models using bounding box lesion slices.
+Train contrastive models using bounding box or no-box CT slices.
 
 ```bash
-python fine_tune_biomedclip_metadata_arg.py --image_dir data/lesion_nobox
+python training/biomedclip.py \
+  --image_dir data/lesion_nobox
 ```
 
-You can switch it to lesion_bbox/
+Add `--bbox` flag to use `lesion_bbox/` instead.
 
 ---
 
 ## 🤖 3. QA Benchmark: LLM-Style (GPT-4V, Gemini, etc.)
 
-Evaluate large vision-language models on lesion-level multiple choice tasks.
+Run clinical lesion-level QA tasks in an LLM-style prompt format:
 
 ```bash
-python run_llm_qa_all_models_notice.py \
+python qa_llm/run_llm_qa_all_models_notice.py \
   --model gpt4v \
   --qa_file data/qa_llm.json \
   --input_dir data/llm/test \
   --output_dir results/qa_gpt4v/
 ```
 
-Tasks: `img2txt`, `ct2txt`, `img2attrib`, `ct2attrib`, `img2size`, etc.
-Each question is saved in output_data.json with model answers. GPT-4V and Gemini include explanations. Other models return answers only.
+- Tasks: `img2txt`, `ct2txt`, `img2attrib`, `ct2attrib`, `img2size`, etc.
+- GPT-4V and Gemini output answers with explanations.
+- Other models (e.g. LLaVA-Med, RadFM) only return predicted choice (A/B/C/D).
+
+> ⚠️ Other models are integrated manually inside their repo; this script provides only task I/O and metadata handling.
+
 ---
 
 ## 🎯 4. QA Benchmark: CLIP-Style (BiomedCLIP, PMC-CLIP)
 
-Use image-text similarity for retrieval-based multiple choice.
+Run contrastive QA using image-text similarity:
 
 ```bash
-python qa_clip/run_qa_clip.py \
-  --model biomedclip \
-  --qa_file data/qa_clip.json \
-  --input_dir data/clip/test
+cd qa_clip
+python run_all_tasks.py
 ```
 
-Tasks: `txt2img`, `txt2bbox`, `img2attrib`
+In `run_all_tasks.py`, set:
+- `dataset_path = "qa_clip_all_final_corrected.json"`
+- `image_base_path = "data/clip/test"` (adjust to image folder)
+- `output_file = "biomedclip_eval_results.json"`
+
+Each task is evaluated independently. Accuracy is printed per task.
+
+- Tasks: `txt2img`, `txt2bbox`, `img2attrib`, `ct2txt`, `ct2attrib`, etc.
 
 ---
 
-## 📊 5. Evaluation of Captions
+## 📊 5. Caption Evaluation
 
-Evaluate Gemini or GPT-4V caption output using automatic metrics:
+Evaluate captioning performance:
 
 ```bash
 python evaluation/evaluate_caption_json.py \
@@ -136,13 +147,12 @@ python evaluation/evaluate_caption_json.py \
 
 Metrics:
 - BLEU-1, METEOR, ROUGE-1
-- BERTScore, Cosine Similarity (SBERT)
+- BERTScore
+- SBERT Cosine Similarity
 
 ---
 
 ## 🧪 Tested Models
-
-CT-Bench was used to evaluate a diverse set of models across both captioning and QA tasks. Model settings and implementation details are available at the links below:
 
 | Model              | Type                   | Source / Settings |
 |--------------------|------------------------|--------------------|
@@ -154,7 +164,7 @@ CT-Bench was used to evaluate a diverse set of models across both captioning and
 | **GPT-4V**           | Commercial LLM-Vision API| [Azure OpenAI Service](https://azure.microsoft.com/en-us/products/ai-services/openai-service) |
 | **Gemini 1.5 Pro**   | Commercial LLM-Vision API| [Google Gemini](https://ai.google.dev/gemini-api) |
 
-Model-specific configurations, input styles (prompting or retrieval), and evaluation setups follow the guidelines in their respective repositories.
+> ⚠️ Model-specific code and settings (e.g., RadFM, LLaVA-Med) are not included in this repo due to complexity. We provide example wrappers and I/O only.
 
 ---
 
@@ -166,19 +176,20 @@ Install core dependencies with:
 pip install -r requirements.txt
 ```
 
-This includes:
+Includes:
 - `pandas`, `nltk`, `tqdm`, `Pillow`
-- `sentence-transformers` for cosine similarity
-- `bert-score` for semantic caption evaluation
+- `sentence-transformers`
+- `bert-score`
 
-> 💡 Note: Each model (e.g., BiomedCLIP, GPT-4V, Gemini) may require additional packages. Refer to the respective model documentation or script headers for setup.
+> 💡 Additional model packages (e.g. `openai`, `open-clip-torch`, etc.) should be installed as needed per script or model.
 
+---
 
-## 🔒 Reproducibility 
+## 🔒 Reproducibility
 
 - This repository is anonymized for NeurIPS review.
-- GPT-4V and BiomedCLIP are primary baselines.
-- Other model results (Gemini, Dragonfly, etc.) are reproducible using included tools.
+- GPT-4V and BiomedCLIP are the main benchmarks.
+- Gemini, RadFM, and other models are tested using the same dataset and task formats.
 
 ---
 
