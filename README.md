@@ -34,32 +34,28 @@ data/
 
 ---
 
-## 🗂️ Project Structure
+# 📁 Project Structure
 
 ```
-ct-bench/
-├── captioning/                    
-│   └── caption_generator.py       # Image captioning with GPT-4V or Gemini
-├── training/                      
-│   └── biomedclip.py              # Fine-tuning BiomedCLIP
-├── qa_llm/                        
-│   └── run_llm_qa_all_models_notice.py  # QA for GPT-4V, Gemini, LLaVA-Med, etc.
-├── qa_clip/                       
-│   ├── run_all_tasks.py           # CLIP-style QA main script
-│   ├── task_dataset_evaluator.py  # Evaluation logic
-│   └── task_dataset_wrapper.py    # Dataset loader
-├── evaluation/                    
-│   └── evaluate_caption_json.py   # Caption metrics evaluation
-├── models/                        
-│   ├── __init__.py
-│   ├── base.py
-│   ├── gpt4v.py
-│   ├── biomedclip.py
-├── results/                       # Output logs, captions, predictions
-├── configs/                       # Optional config files
-├── requirements.txt
-└── README.md
+.
+├── caption/
+│   ├── caption_generator.py          # Script for generating captions
+│   └── evaluate_caption_json.py      # Evaluates caption output in JSON format
+│
+├── qa_clip/
+│   ├── run_all_tasks.py              # Runs all QA tasks using CLIP
+│   ├── task_dataset_evaluator.py     # Evaluates QA datasets
+│   └── task_dataset_wrapper.py       # Wraps datasets for CLIP QA
+│
+├── qa_llm/
+│   └── run_llm.py                    # Script to run LLM-based QA
+│
+├── training/
+│   └── fine_tune_biomedclip_metadata_arg.py  # Fine-tuning script for BioMedCLIP
+│
+└── requirements.txt                 # Python package dependencies
 ```
+
 
 ---
 
