@@ -51,7 +51,7 @@ data/
 │   └── run_llm.py                    # Script to run LLM-based QA
 │
 ├── training/
-│   └── fine_tune_biomedclip_metadata_arg.py  # Fine-tuning script for BioMedCLIP
+│   └── fine_tune.py  # Fine-tuning script for BioMedCLIP
 │
 └── requirements.txt                 # Python package dependencies
 ```
@@ -77,18 +77,30 @@ Change `--model gemini` to use Gemini instead.
 - Output: `gpt4v_captions.json` or `gemini_captions.json`
 - Requires `OPENAI_API_KEY` or `GOOGLE_API_KEY` to be set
 
+Evaluate captioning performance:
+
+```bash
+python captioning/evaluate_caption_json.py \
+  --json_file results/captions/gpt4v_captions.json
+```
+
+Metrics:
+- BLEU-1, METEOR, ROUGE-1
+- BERTScore
+- SBERT Cosine Similarity
+
 ---
 
-## 🧪 2. Fine-Tuning BiomedCLIP on CT-Bench
+## 🧪 2. Fine-Tuning on CT-Bench
 
 Train contrastive models using bounding box or no-box CT slices.
 
 ```bash
-python training/biomedclip.py \
+python training/fine_tune.py \
   --image_dir data/lesion_nobox
 ```
 
-Add `--bbox` flag to use `lesion_bbox/` instead.
+
 
 ---
 
@@ -97,7 +109,7 @@ Add `--bbox` flag to use `lesion_bbox/` instead.
 Run clinical lesion-level QA tasks in an LLM-style prompt format:
 
 ```bash
-python qa_llm/run_llm_qa_all_models_notice.py \
+python qa_llm/run_llm.py \
   --model gpt4v \
   --qa_file data/qa_llm.json \
   --input_dir data/llm/test \
@@ -123,7 +135,7 @@ python run_all_tasks.py
 
 In `run_all_tasks.py`, set:
 - `dataset_path = "qa_clip_all_final_corrected.json"`
-- `image_base_path = "data/clip/test"` (adjust to image folder)
+- `image_base_path = ""` (adjust to image folder)
 - `output_file = "biomedclip_eval_results.json"`
 
 Each task is evaluated independently. Accuracy is printed per task.
@@ -132,21 +144,7 @@ Each task is evaluated independently. Accuracy is printed per task.
 
 ---
 
-## 📊 5. Caption Evaluation
 
-Evaluate captioning performance:
-
-```bash
-python evaluation/evaluate_caption_json.py \
-  --json_file results/captions/gpt4v_captions.json
-```
-
-Metrics:
-- BLEU-1, METEOR, ROUGE-1
-- BERTScore
-- SBERT Cosine Similarity
-
----
 
 ## 🧪 Tested Models
 
