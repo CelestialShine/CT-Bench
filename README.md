@@ -163,19 +163,21 @@ Model-specific configurations, input styles (prompting or retrieval), and evalua
 
 ## ⚙️ Requirements
 
+Install core dependencies with:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-Includes:
-- Python 3.8+
-- PyTorch 2.0+
-- SentenceTransformers, BERTScore
-- OpenAI + Gemini SDKs
+This includes:
+- `pandas`, `nltk`, `tqdm`, `Pillow`
+- `sentence-transformers` for cosine similarity
+- `bert-score` for semantic caption evaluation
 
----
+> 💡 Note: Each model (e.g., BiomedCLIP, GPT-4V, Gemini) may require additional packages. Refer to the respective model documentation or script headers for setup.
 
-## 🔒 Reproducibility & Anonymity
+
+## 🔒 Reproducibility 
 
 - This repository is anonymized for NeurIPS review.
 - GPT-4V and BiomedCLIP are primary baselines.
