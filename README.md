@@ -87,14 +87,10 @@ Change `--model gemini` to use Gemini instead.
 Train contrastive models using bounding box lesion slices.
 
 ```bash
-python training/biomedclip.py \
-  --train --input_dir data/lesion_bbox \
-  --metadata data/Metadata.csv \
-  --output_dir results/biomedclip
+python fine_tune_biomedclip_metadata_arg.py --image_dir data/lesion_nobox
 ```
 
-- Use `--with_bbox` to enable spatial supervision
-- Outputs logs, checkpoints, and evaluation metrics
+You can switch it to lesion_bbox/
 
 ---
 
@@ -103,10 +99,11 @@ python training/biomedclip.py \
 Evaluate large vision-language models on lesion-level multiple choice tasks.
 
 ```bash
-python qa_llm/run_qa_vlm.py \
+python run_llm_qa_all_models_notice.py \
   --model gpt4v \
   --qa_file data/qa_llm.json \
-  --input_dir data/llm/test
+  --input_dir data/llm/test \
+  --output_dir results/qa_gpt4v/
 ```
 
 Tasks: `img2txt`, `ct2txt`, `img2attrib`, `ct2attrib`, `img2size`, etc.
