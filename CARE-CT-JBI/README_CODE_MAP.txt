@@ -1,6 +1,6 @@
 CARE-CT supplementary code files
 
-This directory contains only the code locations listed in the Supplementary Methods Implementation Map. The original uploaded code archive is preserved as CARE_CT_Supplementary_Code_Only_Mentioned.zip.
+The complete paper-specific source package is preserved in CARE_CT_JBI_Supplementary_Code.zip with its original Python folder structure.
 
 Code location                                  Responsibility
 ----------------------------------------------------------------------------------------------------
