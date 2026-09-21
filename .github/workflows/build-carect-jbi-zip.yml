@@ -1,0 +1,37 @@
+name: Build CARE-CT JBI supplementary ZIP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'CARE-CT-JBI/archive/**'
+      - '.github/workflows/build-carect-jbi-zip.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Reconstruct verified ZIP
+        run: |
+          python CARE-CT-JBI/archive/reconstruct_code_archive.py
+          mv CARE-CT-JBI/archive/CARE_CT_JBI_Code.zip CARE-CT-JBI/CARE_CT_JBI_Supplementary_Code.zip
+          sha256sum CARE-CT-JBI/CARE_CT_JBI_Supplementary_Code.zip
+
+      - name: Commit reconstructed ZIP
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CARE-CT-JBI/CARE_CT_JBI_Supplementary_Code.zip
+          if git diff --cached --quiet; then
+            echo "ZIP already up to date"
+            exit 0
+          fi
+          git commit -m "Build verified CARE-CT JBI supplementary ZIP"
+          git push

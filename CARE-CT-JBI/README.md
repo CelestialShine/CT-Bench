@@ -10,7 +10,7 @@ Download the complete archive:
 
 The ZIP preserves the original Python directory structure and contains the 11 implementation files mapped in the Supplementary Methods, together with the code map, checksums, and README.
 
-ZIP SHA-256: `d673ff571a54480e34014a80b3ab86c53498643c25bcee9ec68abc207b9ef931`
+Expected ZIP SHA-256: `cc3a2757ed3d4b32895acaaa370be7c6ca75648135f1c296d5e432731fd0b61b`
 
 ## Included components
 
@@ -23,7 +23,7 @@ ZIP SHA-256: `d673ff571a54480e34014a80b3ab86c53498643c25bcee9ec68abc207b9ef931`
 
 ## Scope
 
-This is the exact paper-specific supplementary code package prepared for the JBI revision. It does not include patient data, CT datasets, model weights, API credentials, or unrelated repository files.
+This is the paper-specific supplementary code package prepared for the JBI revision. It does not include patient data, CT datasets, model weights, API credentials, or unrelated repository files.
 
 ## Citation
 
